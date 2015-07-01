@@ -46,7 +46,13 @@ def commit(retry=False):
     # Switch or create branch.
     # It is done in a manner that does not affect the working tree.
     # Results in morphing the autocommit branch into the current working state.
+    # If you manually switch to another branch this script becomes paused.
     if check_output(get_branch_name, cwd=repo_path) != ac_branch:
+        print('## PAUSED: ON WRONG BRANCH')
+        if input('## Would you like to switch branch or retry now (y/n)?') != 'y':
+            print('## Commit attempt aborted.')
+            commit()
+            return
         try:
             check_call(check_branch_exists, cwd=repo_path)
         except CalledProcessError:
