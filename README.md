@@ -3,7 +3,8 @@ Background python script to agressively commit changes and push them on a timer.
 
 ## What it will do
 * Watch project folder.
-* Commit on every file change on a special autocommit branch.
+* Commit ~~on every file change~~ _every x seconds if a files changes_ on a special autocommit branch.
+  *  Often many files change together (especially in Zim) so commits always need to be grouped. A polled model seems to be more efficient than triggering a hundred changed file events suddenly.
 * Automatically rolls up automatic-commits when user wants to manually commit.
 * Automatically pushes on a timer.
 
