@@ -1,14 +1,13 @@
 # GratuitousGit
 Python script that agressively commits and pushes changes using Git.
 
-## What it does
+## What it does (complete and functional)
 * Tries to commit every x seconds if a change has been made.
  * Set the timer to 1 second to get almost instant commits on save. It will not do any git commands if there are no changes, the files are monitored.
  * If multiple files are saved together they will end up in the same commit. While it is possible to commit each changed file individually on file changed events, which would be excessive and unsuitable for my purposes.
-* Tries to push every y seconds.
+* Tries to push every y seconds if a commit has been made (by the script, does not monitor manual commits).
 
-## Work in progress
-* Only push if a commit has been made (currently spams on timer).
+## Work in progress / proposed developments.
 * Simple pulls.
 
 ## What it won't do
@@ -44,7 +43,8 @@ If the repository is not already on the `ac_branch` the script will pause and as
 
 Checking out another branch will cause the script to automatically pause. This is intended as a way to allow manual work to be done on the repository. The script will not resume until it is told to. I tend to `merge --no-ff` on to my master branch when creating properly named commits.
 
-## Current Status
+## Development Status
+Commit and push complete and usable (in use). May implement pull another day. (03/07/2015)
 Timer based commit and push working (03/07/2015)
 Writing basic functionality (01/07/2015)
 Planning (29/06/2015).
