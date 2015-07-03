@@ -4,14 +4,15 @@ Python script that agressively commits and pushes changes using Git.
 ## What it does
 * Tries to commit every x seconds if a change has been made.
  * Set the timer to 1 second to get almost instant commits on save. It will not do any git commands if there are no changes, the files are monitored.
- * If multiple files are saved together they will end up in the same commit. While it is possible to commit each changed file individually on file changed events, that would be excessive and unsuitable for my purposes.
-* Tries to push every y seconds if a commit has been made (WIP just pushes instead of checking first).
+ * If multiple files are saved together they will end up in the same commit. While it is possible to commit each changed file individually on file changed events, which would be excessive and unsuitable for my purposes.
+* Tries to push every y seconds.
 
 ## Work in progress
+* Only push if a commit has been made (currently spams on timer).
 * Simple pulls.
 
 ## What it won't do
- * Use SSH (uneccassary complication for my needs).
+ * Use SSH (unnecessary complication for my needs).
  * Manage multiple repositories.
  * Make use of gitignore
   * Git will still use it as normal, but this script will attempt to `add -A` when ignored files are changed (though nothing is added or committed).
@@ -19,12 +20,12 @@ Python script that agressively commits and pushes changes using Git.
 
 ## Why
  * I'm using this to auto-save and push my Zim-Wiki to my Git server.
- * Also useful for recovering impulsively deleted un-commited content.
+ * Also useful for recovering impulsively deleted un-committed content.
 
 ## Usage
 ### Warnings
  * The script only pushes its own branch.
- * If you allow the script to change branch it will continue from the working tree state of the banch it switches from (not a normal merge, total replacement on the same tree).
+ * If you allow the script to change branch it will continue from the working tree state of the branch it switches from (not a normal merge, total replacement on the same tree).
 
 ### Setup
 Edit the paths at the top of the script:
@@ -34,14 +35,14 @@ Edit the paths at the top of the script:
 
 Edit the delay times to suit your purposes.
 
-Edit `x.txt` inserting you username, password, host and repo. Altenatively hardcode the value into the script
+Edit `x.txt` inserting you username, password, host and repo. Alternatively hardcode the value into the script
 
-Start the script in a console (if you want to run the script hidden then you must edit the puse bit of the  script).
+Start the script in a console (if you want to run the script hidden then you must edit the pause bit of the script).
 
 ### Running
 If the repository is not already on the `ac_branch` the script will pause and ask permission to change branch. The script will remain pause untill given permission.
 
-Checking out another branch will cause the script to automatically pause. This is intended as a way to allow manual work to be done on the repository. The scritp will not resume untill it is told to. I tend to `merge --no-ff` on to my master branch when creating properly named commits.
+Checking out another branch will cause the script to automatically pause. This is intended as a way to allow manual work to be done on the repository. The script will not resume until it is told to. I tend to `merge --no-ff` on to my master branch when creating properly named commits.
 
 ## Current Status
 Timer based commit and push working (03/07/2015)
