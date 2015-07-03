@@ -10,19 +10,19 @@ from watchdog.events import PatternMatchingEventHandler
 git_path = 'C:/Program Files (x86)/Git/bin/git.exe'
 repo_path = 'W:/zim'
 ac_branch = 'autocommit'
-git_bash_path = r'C:\Program Files (x86)\Git\bin\sh.exe'
-git_bash_arg = '--login'
 
 # Minimum delays in seconds.
 commit_delay = 5
-push_delay = 60  # Needs to be a multiple of commit_delay.
-changed_detected = False
+push_delay = 360  # Needs to be a multiple of commit_delay.
 
 # Use username-password authentication.
 # Reading from file to avoid open-source sharing online.
 with open('x.txt', 'r') as cf:
     # https://username:password@host/username/repo.git
     username_password_at_host_username_repo = cf.read()
+
+changed_detected = False
+new_commits = False
 
 
 class DirModifiedCommitHandler(PatternMatchingEventHandler):
@@ -39,12 +39,14 @@ class DirModifiedCommitHandler(PatternMatchingEventHandler):
 
 def push():
     """ Pushes onto same name tracking branch."""
+    global new_commits
+    new_commits = False
     push_cmd = git_path + ' push ' + username_password_at_host_username_repo + ' ' + ac_branch + ' -u'
     check_call(push_cmd, cwd=repo_path)
 
 
 def commit(retry=False):
-    """ Changes to autocommit branch and commits all changes."""
+    """ Switches to autocommit branch and commits all changes."""
     print('## Starting commit.')
     now = str(time.time())
 
@@ -97,6 +99,7 @@ def commit(retry=False):
         check_call(check_if_commit_is_needed, cwd=repo_path)
         print('## Nothing to commit.')
     except CalledProcessError:
+        # This is the commit block.
         try:
             check_call(commit_cmd, cwd=repo_path)
         except CalledProcessError:
@@ -105,6 +108,12 @@ def commit(retry=False):
                 print('# ...retrying.')
                 time.sleep(2)
                 commit(True)
+        finally:
+            # Flag the new commit after its completed.
+            # This is erring on the side that a commit may be made with an error code (TODO: is this possible?)
+            global new_commits
+            new_commits = True
+
     print('## Commit attempt complete.')
 
 
@@ -129,7 +138,8 @@ def start():
                 commit()
             if counter >= push_delay:
                 counter = 0
-                push()
+                if new_commits:
+                    push()
 
     except (KeyboardInterrupt, SystemExit):
         observer.stop()
