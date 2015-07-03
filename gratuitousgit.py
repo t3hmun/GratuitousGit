@@ -2,6 +2,7 @@ import time
 from subprocess import check_call
 from subprocess import check_output
 from subprocess import CalledProcessError
+import subprocess
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
@@ -10,10 +11,16 @@ from watchdog.events import PatternMatchingEventHandler
 git_path = 'C:/Program Files (x86)/Git/bin/git.exe'
 repo_path = 'W:/zim'
 ac_branch = 'autocommit'
-# Minimum delay between commits in seconds.
-delay = 5
+remote = "syncserver"
 
+# Minimum delays in seconds.
+commit_delay = 1
+push_delay = 2  # Needs to be a multiple of commit_delay.
 changed_detected = False
+
+# The SSH password used on push.
+with open('x.txt', 'r') as cf:
+    password = cf.read()
 
 
 class DirModifiedCommitHandler(PatternMatchingEventHandler):
@@ -28,8 +35,20 @@ class DirModifiedCommitHandler(PatternMatchingEventHandler):
         changed_detected = True
 
 
+def push():
+    """ Pushes onto same name tracking branch."""
+    push_cmd = git_path + ' push ' + remote + ' ' + ac_branch + ' -u'
+    print(push_cmd)
+    try:
+        print(check_output(push_cmd, cwd=repo_path))
+    except CalledProcessError:
+        print('CPE bro')
+
+    print('end_push')
+
+
 def commit(retry=False):
-    """ Changes to autocommit branch and commits all changes"""
+    """ Changes to autocommit branch and commits all changes."""
     print('## Starting commit.')
     now = str(time.time())
 
@@ -47,7 +66,9 @@ def commit(retry=False):
     # It is done in a manner that does not affect the working tree.
     # Results in morphing the autocommit branch into the current working state.
     # If you manually switch to another branch this script becomes paused.
-    if check_output(get_branch_name, cwd=repo_path) != ac_branch:
+    # Decode because its bytes not unicode, and also strip the newline.
+    actual_branch = check_output(get_branch_name, cwd=repo_path).decode('ascii').strip()
+    if actual_branch != ac_branch:
         print('## PAUSED: ON WRONG BRANCH')
         if input('## Would you like to switch branch or retry now (y/n)?') != 'y':
             print('## Commit attempt aborted.')
@@ -103,11 +124,16 @@ def start():
     observer.start()
 
     try:
+        counter = 0
         while True:
-            time.sleep(delay)
+            time.sleep(commit_delay)
+            counter += commit_delay
             if changed_detected:
                 changed_detected = False
                 commit()
+            if counter >= push_delay:
+                counter = 0
+                push()
 
     except (KeyboardInterrupt, SystemExit):
         observer.stop()
