@@ -1,5 +1,5 @@
 # GratuitousGit
-Background python script to regulary commit and push changes on a timer. 
+Python script that agressively commits and pushes changes using Git.
 
 ## What it does
 * Tries to commit every x seconds if a change has been made.
