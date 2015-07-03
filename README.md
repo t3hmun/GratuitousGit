@@ -3,16 +3,19 @@ Python script that agressively commits and pushes changes using Git.
 
 ## What it does
 * Tries to commit every x seconds if a change has been made.
+ * Set the timer to 1 second to get almost instant commits on save. It will not do any git commands if there are no changes, the files are monitored.
+ * If multiple files are saved together they will end up in the same commit. While it is possible to commit each changed file individually on file changed events, that would be excessive and unsuitable for my purposes.
 * Tries to push every y seconds if a commit has been made (WIP just pushes instead of checking first).
 
 ## Work in progress
-* Commit instantly on every save.
- * If many files are saved at the same time they will become grouped.
 * Simple pulls.
 
 ## What it won't do
  * Use SSH (uneccassary complication for my needs).
  * Manage multiple repositories.
+ * Make use of gitignore
+  * Git will still use it as normal, but this script will attempt to `add -A` when ignored files are changed (though nothing is added or committed).
+  * This is only a problem if you happen to have rapidly modified ignore files causing `add -A` to be spammed. In this case try adding the ignore to `ignore_patterns` in the script.
 
 ## Why
  * I'm using this to auto-save and push my Zim-Wiki to my Git server.
@@ -21,7 +24,7 @@ Python script that agressively commits and pushes changes using Git.
 ## Usage
 ### Warnings
  * The script only pushes its own branch.
- * If you allow the script to change branch it will continue from the state of the banch it switches from (not a normal merge).
+ * If you allow the script to change branch it will continue from the working tree state of the banch it switches from (not a normal merge, total replacement on the same tree).
 
 ### Setup
 Edit the paths at the top of the script:
