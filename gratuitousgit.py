@@ -2,7 +2,6 @@ import time
 from subprocess import check_call
 from subprocess import check_output
 from subprocess import CalledProcessError
-import subprocess
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
@@ -11,16 +10,19 @@ from watchdog.events import PatternMatchingEventHandler
 git_path = 'C:/Program Files (x86)/Git/bin/git.exe'
 repo_path = 'W:/zim'
 ac_branch = 'autocommit'
-remote = "syncserver"
+git_bash_path = r'C:\Program Files (x86)\Git\bin\sh.exe'
+git_bash_arg = '--login'
 
 # Minimum delays in seconds.
-commit_delay = 1
-push_delay = 2  # Needs to be a multiple of commit_delay.
+commit_delay = 5
+push_delay = 60  # Needs to be a multiple of commit_delay.
 changed_detected = False
 
-# The SSH password used on push.
+# Use username-password authentication.
+# Reading from file to avoid open-source sharing online.
 with open('x.txt', 'r') as cf:
-    password = cf.read()
+    # https://username:password@host/username/repo.git
+    username_password_at_host_username_repo = cf.read()
 
 
 class DirModifiedCommitHandler(PatternMatchingEventHandler):
@@ -37,14 +39,8 @@ class DirModifiedCommitHandler(PatternMatchingEventHandler):
 
 def push():
     """ Pushes onto same name tracking branch."""
-    push_cmd = git_path + ' push ' + remote + ' ' + ac_branch + ' -u'
-    print(push_cmd)
-    try:
-        print(check_output(push_cmd, cwd=repo_path))
-    except CalledProcessError:
-        print('CPE bro')
-
-    print('end_push')
+    push_cmd = git_path + ' push ' + username_password_at_host_username_repo + ' ' + ac_branch + ' -u'
+    check_call(push_cmd, cwd=repo_path)
 
 
 def commit(retry=False):
